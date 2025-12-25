@@ -3,20 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محراب | أقرب مسجد</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>محراب | ابحث عن أقرب مسجد</title>
+    <style>
+        /* التنسيق الفخم والزاهي */
+        body {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #2d3436;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem 2rem;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: #00b894;
+            letter-spacing: -1px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #636e72;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .main-btn {
+            background: #2d3436;
+            color: white;
+            border: none;
+            padding: 20px;
+            width: 100%;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .main-btn:hover {
+            transform: translateY(-3px);
+            background: #000;
+            box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+        }
+
+        #status {
+            margin-top: 1.5rem;
+            font-size: 15px;
+            font-weight: 600;
+            min-height: 24px;
+            color: #636e72;
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 12px;
+            color: #b2bec3;
+            letter-spacing: 1px;
+        }
+    </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="logo-icon">
-            <div></div>
-        </div>
+        <h1>مِـحـرَاب</h1>
+        <p>بضغطة زر واحدة، نساعدك في الوصول إلى أقرب بيت من بيوت الله حولك.</p>
         
-        <h1>محراب</h1>
-        <p>بضغطة زر واحدة، نساعدك في العثور على أقرب بيت من بيوت الله حولك.</p>
-        
-        <button id="findBtn" class="main-btn">العثور على مسجد</button>
+        <button id="findBtn" class="main-btn">العثور على مسجد الآن</button>
         
         <div id="status"></div>
 
@@ -25,6 +94,49 @@
         </footer>
     </div>
 
-    <script src="js/script.js"></script>
+    <script>
+        document.getElementById('findBtn').onclick = function() {
+            const status = document.getElementById('status');
+            const btn = document.getElementById('findBtn');
+
+            status.textContent = "جاري تحديد موقعك بدقة...";
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        status.textContent = "تم التحديد، جاري فتح الخرائط...";
+                        status.style.color = "#00b894";
+
+                        // الرابط الصحيح للبحث عن المساجد بناءً على إحداثيات المستخدم
+                        const googleMapsUrl = `https://www.google.com/maps/search/mosque/@${lat},${lon},15z`;
+
+                        setTimeout(() => {
+                            window.location.href = googleMapsUrl;
+                        }, 1000);
+                    },
+                    (error) => {
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                        status.style.color = "#d63031";
+                        
+                        if (error.code === 1) {
+                            status.textContent = "يرجى السماح للمتصفح بالوصول للموقع.";
+                        } else {
+                            status.textContent = "حدث خطأ في تحديد الموقع، حاول ثانية.";
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                status.textContent = "متصفحك لا يدعم هذه الخدمة.";
+                status.style.color = "#d63031";
+            }
+        };
+    </script>
 </body>
 </html>
